@@ -1,10 +1,9 @@
+// library imports
 import ReactDOM from 'react-dom';
 import React from 'react';
+// component imports
+import App from './App';
 
-const App = () => {
-  return (
-    <h1>Prompt Calendar</h1>
-  );
-}
-
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(
+  <App />,
+document.getElementById('root'));
