@@ -8,7 +8,6 @@ import "./index.css"
 const App = () => {
   return (
     <div>
-      <h1>Prompt Calendar</h1>
       <Month />
     </div>
   );
