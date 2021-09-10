@@ -1,16 +1,23 @@
 // library imports
-import React from 'react';
+import React from "react";
+// component imports
+import AppointmentModal from "../modals/AppointmentModal";
+// hook imports
+import useModal from "../../hooks/useModal";
 
 const Day = ( props ) => {
-  let { day, startingWeekday } = props;
+  const { day, startingWeekday } = props;
   const currentDate = new Date().getDate();
+  const { isShowing, toggle } = useModal();
 
   return (
     <div
-      className={`date ${day === currentDate ? "today" : ""} ${day < currentDate ? "past" : ""}`}
-      style={ {gridColumn: day === 1 ? startingWeekday : ""} }
+      className={`date ${day.date === currentDate ? "today" : ""} ${day.date < currentDate ? "past" : ""}`}
+      style={ {gridColumn: day.date === 1 ? startingWeekday : ""} }
+      onClick={toggle}
     >
-      {day}
+      {day.date}
+      <AppointmentModal key={new Date().getTime()} day={day} isShowing={isShowing} toggle={toggle} />
     </div>
   );
 };

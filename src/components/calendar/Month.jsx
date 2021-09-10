@@ -6,11 +6,15 @@ import Day from "./Day";
 const Month = () => {
   const dateObj = new Date();
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30 ,31];
   const dayOfWeek = ["Sunday", "Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const firstDayOfMonth = new Date(`${dateObj.getMonth() + 1} 01, ${dateObj.getFullYear()}`)
-
-  let days = Array.from({length: monthDays[dateObj.getMonth()]}, (_, index) => index + 1);
+  const days = Array.from({length: new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate()}, (_, index) => {
+    return {
+      month: months[dateObj.getMonth()],
+      date: index + 1,
+      year: dateObj.getFullYear()
+    }
+  });
+  const firstDayOfMonth = new Date(`${dateObj.getMonth() + 1} 01, ${dateObj.getFullYear()}`).getDay() + 1;
 
   return (
     <div className="month">
@@ -26,7 +30,7 @@ const Month = () => {
 
       <div className="date-grid">
         {days.map((day, index) => (
-          <Day day={day} startingWeekday={firstDayOfMonth.getDay()} key={new Date().getTime() + index}/>
+          <Day day={day} startingWeekday={firstDayOfMonth} key={new Date().getTime() + index}/>
         ))}
       </div>
 
