@@ -1,5 +1,5 @@
 // library imports
-import React, {useState} from "react";
+import React from "react";
 // component imports
 import AppointmentModal from "../modals/AppointmentModal";
 // hook imports
