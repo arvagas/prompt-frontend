@@ -1,24 +1,31 @@
 // library imports
-import React from 'react';
+import React, { useContext } from 'react';
 // component imports
 import Day from "./Day";
+// context imports
+import { DateTimeContext } from '../../contexts/DateTimeContext';
+// data import
+import { months, dayOfWeek } from '../../data/calendar';
 
 const Month = () => {
-  const dateObj = new Date();
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const dayOfWeek = ["Sunday", "Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const days = Array.from({length: new Date(dateObj.getFullYear(), dateObj.getMonth() + 1, 0).getDate()}, (_, index) => {
+  const {
+    defaultStartTime, defaultEndTime,
+    currentDate, setCurrentDate,
+    selectedMonth, setSelectedMonth,
+    selectedYear, setSelectedYear
+  } = useContext(DateTimeContext)
+  const days = Array.from({length: new Date(selectedYear, selectedMonth + 1, 0).getDate()}, (_, index) => {
     return {
-      month: months[dateObj.getMonth()],
+      month: currentDate.getMonth(),
       date: index + 1,
-      year: dateObj.getFullYear()
+      year: currentDate.getFullYear()
     }
   });
-  const firstDayOfMonth = new Date(`${dateObj.getMonth() + 1} 01, ${dateObj.getFullYear()}`).getDay() + 1;
+  const firstDayOfMonth = new Date(`${selectedMonth + 1} 01, ${selectedYear}`).getDay() + 1;
 
   return (
     <div className="month">
-      <h1 className="month-header">{months[dateObj.getMonth()]} {dateObj.getFullYear()}</h1>
+      <h1 className="month-header">{months[selectedMonth]} {selectedYear}</h1>
 
       <div className="day-of-week">
         {dayOfWeek.map((weekdayName, index) => (

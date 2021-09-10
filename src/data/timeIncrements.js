@@ -27,7 +27,7 @@ const roundUpTo = roundTo => x => Math.ceil(x / roundTo) * roundTo;
 
 const roundUpTo15Minutes = roundUpTo(1000 * 60 * 15);
 
-const getDefaultStartingTime = () => {
+const getDefaultStartTime = () => {
   let temp = roundUpTo15Minutes(new Date());
   let d = new Date(temp);
 
@@ -35,7 +35,7 @@ const getDefaultStartingTime = () => {
 }
 
 const getDefaultEndTime = () => {
-  let temp = getDefaultStartingTime();
+  let temp = getDefaultStartTime();
   let hourCheck = temp.split(":");
 
   hourCheck[0] = parseInt(hourCheck[0]);
@@ -46,4 +46,4 @@ const getDefaultEndTime = () => {
   return `${hourCheck.join(":")}`
 }
 
-export { timesArr, getDefaultStartingTime, getDefaultEndTime };
+export { timesArr, getDefaultStartTime, getDefaultEndTime };
