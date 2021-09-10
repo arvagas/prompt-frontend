@@ -6,6 +6,7 @@ import Month from '../calendar/Month';
 // context imports
 import { UserContext } from '../../contexts/UserContext';
 import { DateTimeContext } from '../../contexts/DateTimeContext';
+import { SchedulesContext } from '../../contexts/SchedulesContext';
 // data imports
 import { timesArr, getDefaultStartTime, getDefaultEndTime } from "../../data/timeIncrements";
 
@@ -16,6 +17,7 @@ const AppRouter = () => {
   const [ currentDate, setCurrentDate ] = useState();
   const [ selectedMonth, setSelectedMonth ] = useState();
   const [ selectedYear, setSelectedYear ] = useState();
+  const [ currentAppointments, setCurrentAppointments ] = useState()
 
   useEffect(() => {
     setDefaultStartTime(getDefaultStartTime());
@@ -24,20 +26,37 @@ const AppRouter = () => {
     setCurrentDate(dateObj);
     setSelectedMonth(dateObj.getMonth());
     setSelectedYear(dateObj.getFullYear());
+
+    // grab schedules from backend
+    fetch("https://prompt-backend.herokuapp.com/api/appointments/all", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(jsonRes => {
+        setCurrentAppointments(jsonRes);
+      })
   }, [])
 
   let userValues = { token, setToken };
-  let dateTimeValues = { defaultStartTime, defaultEndTime,
-                        currentDate, setCurrentDate,
-                        selectedMonth, setSelectedMonth,
-                        selectedYear, setSelectedYear };
+  let dateTimeValues = {
+    defaultStartTime, defaultEndTime,
+    currentDate, setCurrentDate,
+    selectedMonth, setSelectedMonth,
+    selectedYear, setSelectedYear
+  };
+  let scheduleValues = { currentAppointments, setCurrentAppointments }
 
   return (
     <UserContext.Provider value={userValues}>
       <DateTimeContext.Provider value={dateTimeValues}>
-        <Switch>
-          <Route exact path="/" component={Month} />
-        </Switch>
+        <SchedulesContext.Provider value={scheduleValues}>
+          <Switch>
+            <Route exact path="/" component={Month} />
+          </Switch>
+        </SchedulesContext.Provider>
       </DateTimeContext.Provider>
     </UserContext.Provider>
   );

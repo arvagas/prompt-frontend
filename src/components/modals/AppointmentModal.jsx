@@ -6,6 +6,8 @@ import { timesArr } from "../../data/timeIncrements";
 // context import
 import { DateTimeContext } from '../../contexts/DateTimeContext';
 import { UserContext } from '../../contexts/UserContext';
+// data import
+import { months } from '../../data/calendar';
 
 const ConfirmationModal = (props) => {
   const { day, isShowing, toggle } = props;
@@ -70,7 +72,7 @@ const ConfirmationModal = (props) => {
           <input id="appt-title" name="title" type="text" placeholder="Add title" onChange={handleChange} />
 
           <div>
-            {day.month} {day.date}, {day.year}
+            {months[day.month]} {day.date}, {day.year}
           </div>
           
           <div className="date-times">

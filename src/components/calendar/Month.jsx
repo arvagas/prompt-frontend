@@ -4,6 +4,8 @@ import React, { useContext } from 'react';
 import Day from "./Day";
 // context imports
 import { DateTimeContext } from '../../contexts/DateTimeContext';
+// data import
+import { months, dayOfWeek } from '../../data/calendar';
 
 const Month = () => {
   const {
@@ -12,11 +14,9 @@ const Month = () => {
     selectedMonth, setSelectedMonth,
     selectedYear, setSelectedYear
   } = useContext(DateTimeContext)
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  const dayOfWeek = ["Sunday", "Monday","Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const days = Array.from({length: new Date(selectedYear, selectedMonth + 1, 0).getDate()}, (_, index) => {
     return {
-      month: months[currentDate.getMonth()],
+      month: currentDate.getMonth(),
       date: index + 1,
       year: currentDate.getFullYear()
     }
