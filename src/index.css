@@ -1,3 +1,8 @@
+button {
+  width: 75px;
+  padding: 5px;
+}
+
 .month-header {
   text-align: center;
 }
@@ -33,4 +38,88 @@
 
 .today {
   background-color: lightgreen;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  outline: 0;
+}
+
+.modal {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  width: 100%;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  background-color: lightgray;
+  border-radius: 20px 20px 0 0;
+  text-align: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-title {
+  font-weight: bolder;
+}
+
+.modal-close {
+  font-weight: bolder;
+  color: gray;
+}
+
+.modal-close:hover {
+  color: red;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.modal-body > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.modal-bottom {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid lightgray;
+  padding: 20px;
+}
+
+.modal-create,
+.modal-cancel {
+  cursor: pointer;
+}
+
+.modal-bottom button:first-child {
+  margin-right: 1rem;
 }
