@@ -1,36 +1,17 @@
 // library imports
 import React from "react";
 import { createPortal } from "react-dom";
+// data import
+import { timesArr, getDefaultStartingTime, getDefaultEndTime } from "../../data/timeIncrements";
 
 const ConfirmationModal = (props) => {
   const { day, isShowing, toggle } = props;
-  const timesBase = ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
-  const timesAppend = [":00", ":15", ":30", ":45"];
-  let timesBaseCounter = 0;
-  let timesAppendCounter = 0;
-  const timesArr = Array.from({length: 96}, (_, index) => {
-    let timesJoin = "";
-
-    timesJoin += timesBase[timesBaseCounter];
-
-    timesJoin += timesAppend[timesAppendCounter];
-    timesAppendCounter++;
-
-    if (timesAppendCounter === 4) {
-      timesAppendCounter = 0;
-      timesBaseCounter++;
-    }
-
-    if (index < 48) timesJoin += "am";
-    else timesJoin += "pm";
-
-    return timesJoin;
-  });
+  const defaultStartingTime = getDefaultStartingTime();
+  const defaultEndTime = getDefaultEndTime();
 
   if (!isShowing) return null;
   return createPortal(
-    <>
-      <div className="modal-overlay" />
+    <div className="modal-overlay">
       <div className="modal-wrapper" onClick={(event) => event.stopPropagation()}>
         <div className="modal">
           <div className="modal-top">
@@ -49,13 +30,13 @@ const ConfirmationModal = (props) => {
               <span>From </span>
               <select>
                 {timesArr.map((time, index) => (
-                  <option key={new Date().getTime()+index} value={time}>{time}</option>
+                  <option key={new Date().getTime()+index} value={time} defaultValue={defaultStartingTime === time}>{time}</option>
                 ))}
               </select>
               <span> To </span>
               <select>
                 {timesArr.map((time, index) => (
-                  <option key={new Date().getTime()+index} value={time}>{time}</option>
+                  <option key={new Date().getTime()+index} value={time} defaultValue={defaultEndTime === time}>{time}</option>
                 ))}
               </select>
             </div>
@@ -67,7 +48,7 @@ const ConfirmationModal = (props) => {
           </div>
         </div>
       </div>
-    </>,
+    </div>,
     document.getElementById("modal-root")
   );
 };
