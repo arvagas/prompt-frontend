@@ -31,7 +31,7 @@ button {
 }
 
 .date {
-  height: 5rem;
+  height: 15vh;
   border: 1px solid black;
   padding: 1px;
 }
