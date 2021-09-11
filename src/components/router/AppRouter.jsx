@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';
 // component imports
-import Month from '../calendar/Month';
+import LandingPage from '../LandingPage';
 // context imports
 import { UserContext } from '../../contexts/UserContext';
 import { DateTimeContext } from '../../contexts/DateTimeContext';
@@ -40,6 +40,21 @@ const AppRouter = () => {
       })
   }, [])
 
+  // this is temporary
+  useEffect(() => {
+    fetch("https://prompt-backend.herokuapp.com/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({username: "admin", password: "password1234"})
+    })
+    .then(res => res.json())
+    .then(jsonRes => {
+      setToken(jsonRes.token)
+    })
+  }, [])
+
   let userValues = { token, setToken };
   let dateTimeValues = {
     defaultStartTime, defaultEndTime,
@@ -54,7 +69,7 @@ const AppRouter = () => {
       <DateTimeContext.Provider value={dateTimeValues}>
         <SchedulesContext.Provider value={scheduleValues}>
           <Switch>
-            <Route exact path="/" component={Month} />
+            <Route exact path="/" component={LandingPage} />
           </Switch>
         </SchedulesContext.Provider>
       </DateTimeContext.Provider>
