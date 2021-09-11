@@ -42,7 +42,8 @@ const Day = ( props ) => {
       {day.date}
       {appointmentForTheDay ? (
         <div className="with-appt">
-          {appointmentForTheDay.title}
+          <span className="with-appt-title">{appointmentForTheDay.title}</span><br/>
+          <span className="with-appt-time">{appointmentForTheDay.timeStart} - {appointmentForTheDay.timeEnd}</span>
         </div>
       ) : ( <></> )}
       <AppointmentModal key={new Date().getTime()} day={day} isShowing={isShowing} toggle={toggle} apptCheck={hasAppointment} apptForTheDay={appointmentForTheDay} />

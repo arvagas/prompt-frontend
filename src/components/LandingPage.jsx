@@ -18,13 +18,13 @@ const LandingPage = () => {
     <div>
       {!token ? 
         <div className="top-bar">
-          <button>Login</button>
-          <button>Register</button>
+          <button className="modal-login">Login</button>
+          <button className="modal-register">Register</button>
         </div>
       : 
         <div className="top-bar">
           <h3>Welcome, {jwt_decode(token).username}</h3>
-          <button onClick={handleLogout}>Logout</button>
+          <button className="modal-logout" onClick={handleLogout}>Logout</button>
         </div>
       }
       <Month />

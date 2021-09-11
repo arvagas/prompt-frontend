@@ -3,6 +3,16 @@ button {
   padding: 5px;
 }
 
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.top-bar *:not(last-child) {
+  margin-right: 20px;
+}
+
 .month-header {
   text-align: center;
 }
@@ -38,6 +48,20 @@ button {
 
 .today {
   background-color: lightgreen;
+}
+
+.with-appt {
+  background-color: salmon;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.with-appt-title {
+  font-size: 1rem;
+}
+
+.with-appt-time {
+  font-size: 0.8rem;
 }
 
 .modal-overlay {
@@ -105,8 +129,26 @@ button {
 }
 
 .modal-create,
-.modal-cancel {
+.modal-cancel,
+.modal-delete,
+.modal-update,
+.modal-login,
+.modal-logout,
+.modal-register {
   cursor: pointer;
+  border-radius: 5px;
+}
+
+.modal-create {
+  background-color: lightskyblue;
+}
+
+.modal-delete {
+  background-color: lightcoral;
+}
+
+.modal-update {
+  background-color: lightgoldenrodyellow;
 }
 
 .modal-bottom button:not(last-child) {
