@@ -4,6 +4,7 @@ import React, { useContext } from 'react';
 import Day from "./Day";
 // context imports
 import { DateTimeContext } from '../../contexts/DateTimeContext';
+import { SchedulesContext } from '../../contexts/SchedulesContext';
 // data import
 import { months, dayOfWeek } from '../../data/calendar';
 
@@ -14,6 +15,7 @@ const Month = () => {
     selectedMonth, setSelectedMonth,
     selectedYear, setSelectedYear
   } = useContext(DateTimeContext)
+  const { currentAppointments } = useContext(SchedulesContext);
   const days = Array.from({length: new Date(selectedYear, selectedMonth + 1, 0).getDate()}, (_, index) => {
     return {
       month: currentDate.getMonth(),
@@ -23,6 +25,7 @@ const Month = () => {
   });
   const firstDayOfMonth = new Date(`${selectedMonth + 1} 01, ${selectedYear}`).getDay() + 1;
 
+  if (!currentAppointments) return (<h2>Loading...</h2>);
   return (
     <div className="month">
       <h1 className="month-header">{months[selectedMonth]} {selectedYear}</h1>

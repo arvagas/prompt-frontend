@@ -18,13 +18,15 @@ const Day = ( props ) => {
   } = useContext(DateTimeContext);
   const { isShowing, toggle } = useModal();
   const { currentAppointments } = useContext(SchedulesContext);
-  const [ appointmentsForTheDay, setAppointmentsForTheDay ] = useState([]);
+  const [ appointmentForTheDay, setAppointmentForTheDay ] = useState(null);
+  const [ hasAppointment, setHasAppointment ] = useState(false);
   
   useEffect(() => {
     if (currentAppointments) {
       currentAppointments.forEach(appt => {
         if ((appt.date === day.date) && (appt.month === day.month+1) && (appt.year === day.year)) {
-          setAppointmentsForTheDay(appointmentsForTheDay => [...appointmentsForTheDay, appt]);
+          setAppointmentForTheDay(appt);
+          setHasAppointment(true);
         };
       });
     };
@@ -38,12 +40,12 @@ const Day = ( props ) => {
       onClick={toggle}
     >
       {day.date}
-      {appointmentsForTheDay && appointmentsForTheDay.map(appt => (
-        <div>
-          {appt.title}
+      {appointmentForTheDay ? (
+        <div className="with-appt">
+          {appointmentForTheDay.title}
         </div>
-      ))}
-      <AppointmentModal key={new Date().getTime()} day={day} isShowing={isShowing} toggle={toggle} />
+      ) : ( <></> )}
+      <AppointmentModal key={new Date().getTime()} day={day} isShowing={isShowing} toggle={toggle} apptCheck={hasAppointment} apptForTheDay={appointmentForTheDay} />
     </div>
   );
 };
