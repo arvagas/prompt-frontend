@@ -28,6 +28,10 @@ const ConfirmationModal = (props) => {
   const [ timeStart, setTimeStart ] = useState(apptForTheDay ? apptForTheDay.timeStart : defaultStartTime);
   const [ timeEnd, setTimeEnd ] = useState(apptForTheDay ? apptForTheDay.timeEnd : defaultEndTime);
   const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : 0);
+  const [ errors, setErrors ] = useState({
+    titleInputError: "",
+    timeInputError: ""
+  });
 
   useEffect(() => {
     if (!token) {
@@ -56,14 +60,23 @@ const ConfirmationModal = (props) => {
     // data validation, then update values
     switch (name) {
       case 'title':
-        // validation to have title > 1
+        if(!value.length) setErrors({...errors, titleInputError: "Title is a required field."});
+        else setErrors({...errors, titleInputError: ""});
         setTitle(value);
         break;
       case 'timeStart':
-        setTimeStart(value);
+        if (timesArr.indexOf(value) >= timesArr.indexOf(timeEnd)) setErrors({...errors, timeInputError: "Start time can not be greater than end time."});
+        else {
+          setErrors({...errors, timeInputError: ""});
+          setTimeEnd(value);
+        }
         break;
       case 'timeEnd':
-        setTimeEnd(value);
+        if (timesArr.indexOf(value) <= timesArr.indexOf(timeStart)) setErrors({...errors, timeInputError: "End time must be greater than start time."});
+        else {
+          setErrors({...errors, timeInputError: ""});
+          setTimeEnd(value);
+        }
         break;
       default:
         break;
@@ -99,7 +112,7 @@ const ConfirmationModal = (props) => {
   }
 
   const handleDelete = (event) => {
-    event.preventDefault;
+    event.preventDefault();
 
     fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
       method: "DELETE",
@@ -115,7 +128,7 @@ const ConfirmationModal = (props) => {
   }
 
   const handleUpdate = (event) => {
-    event.preventDefault;
+    event.preventDefault();
 
     const updateAppointmentObj = {
       title: title,
@@ -156,6 +169,7 @@ const ConfirmationModal = (props) => {
 
         <div className="modal-body">
           <input id="appt-title" name="title" type="text" placeholder="Add title" value={title} onChange={handleChange} />
+          {errors.titleInputError ? <span className="modal-error-message">{errors.titleInputError}</span> : <></>}
 
           <div>
             {months[day.month]} {day.date}, {day.year}
@@ -175,6 +189,7 @@ const ConfirmationModal = (props) => {
               ))}
             </select>
           </div>
+          {errors.timeInputError ? <span className="modal-error-message">{errors.timeInputError}</span> : <></>}
         </div>
         
         <div className = "modal-bottom">
