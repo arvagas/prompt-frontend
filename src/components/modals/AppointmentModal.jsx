@@ -87,28 +87,36 @@ const ConfirmationModal = (props) => {
     // add validation check to see if there are any error messages first
     event.preventDefault();
 
-    const newAppointmentObj = {
-      title: title,
-      month: month + 1,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
-
-    fetch("https://prompt-backend.herokuapp.com/api/appointments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(newAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      setCurrentAppointments([...currentAppointments, jsonRes]);
-    })
+    if (errors.titleInputError || errors.timeInputError) alert("Please fill in the required fields.");
+    else {
+      // make sure there are truly no errors if clicked submit instantly
+      if (!title) setErrors({...errors, titleInputError: "Title is a required field."});
+      else {
+        const newAppointmentObj = {
+          title: title,
+          month: month + 1,
+          date: date,
+          year: year,
+          timeStart: timeStart,
+          timeEnd: timeEnd,
+          userID: userId
+        };
+  
+        fetch("https://prompt-backend.herokuapp.com/api/appointments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "token": token
+          },
+          body: JSON.stringify(newAppointmentObj)
+        })
+        .then(res => res.json())
+        .then(jsonRes => {
+          setCurrentAppointments([...currentAppointments, jsonRes]);
+        })
+        .catch(err => alert("An error has occured. Please try again later."))
+      };
+    }
   }
 
   const handleDelete = (event) => {
@@ -130,32 +138,36 @@ const ConfirmationModal = (props) => {
   const handleUpdate = (event) => {
     event.preventDefault();
 
-    const updateAppointmentObj = {
-      title: title,
-      month: month,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
+    if (!errors.titleInputError || !errors.timeInputError) alert("Please fill in the required fields.");
+    else {
+      const updateAppointmentObj = {
+        title: title,
+        month: month,
+        date: date,
+        year: year,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        userID: userId
+      };
 
-    fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(updateAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      let updatedAppts = currentAppointments.map(appt => {
-        if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
-        return appt;
+      fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify(updateAppointmentObj)
       })
-      setCurrentAppointments(updatedAppts);
-    })
+      .then(res => res.json())
+      .then(jsonRes => {
+        let updatedAppts = currentAppointments.map(appt => {
+          if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
+          return appt;
+        })
+        setCurrentAppointments(updatedAppts)
+      })
+      .catch(err => alert("An error has occured. Please try again later."))
+    };
   }
 
   if (!isShowing) return null;
