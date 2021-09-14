@@ -28,6 +28,10 @@ const ConfirmationModal = (props) => {
   const [ timeStart, setTimeStart ] = useState(apptForTheDay ? apptForTheDay.timeStart : defaultStartTime);
   const [ timeEnd, setTimeEnd ] = useState(apptForTheDay ? apptForTheDay.timeEnd : defaultEndTime);
   const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : 0);
+  const [ errors, setErrors ] = useState({
+    titleInputError: "",
+    timeInputError: ""
+  });
 
   useEffect(() => {
     if (!token) {
@@ -56,14 +60,23 @@ const ConfirmationModal = (props) => {
     // data validation, then update values
     switch (name) {
       case 'title':
-        // validation to have title > 1
+        if(!value.length) setErrors({...errors, titleInputError: "Title is a required field."});
+        else setErrors({...errors, titleInputError: ""});
         setTitle(value);
         break;
       case 'timeStart':
-        setTimeStart(value);
+        if (timesArr.indexOf(value) >= timesArr.indexOf(timeEnd)) setErrors({...errors, timeInputError: "Start time can not be greater than end time."});
+        else {
+          setErrors({...errors, timeInputError: ""});
+          setTimeEnd(value);
+        }
         break;
       case 'timeEnd':
-        setTimeEnd(value);
+        if (timesArr.indexOf(value) <= timesArr.indexOf(timeStart)) setErrors({...errors, timeInputError: "End time must be greater than start time."});
+        else {
+          setErrors({...errors, timeInputError: ""});
+          setTimeEnd(value);
+        }
         break;
       default:
         break;
@@ -74,32 +87,40 @@ const ConfirmationModal = (props) => {
     // add validation check to see if there are any error messages first
     event.preventDefault();
 
-    const newAppointmentObj = {
-      title: title,
-      month: month + 1,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
-
-    fetch("https://prompt-backend.herokuapp.com/api/appointments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(newAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      setCurrentAppointments([...currentAppointments, jsonRes]);
-    })
+    if (errors.titleInputError || errors.timeInputError) alert("Please fill in the required fields.");
+    else {
+      // make sure there are truly no errors if clicked submit instantly
+      if (!title) setErrors({...errors, titleInputError: "Title is a required field."});
+      else {
+        const newAppointmentObj = {
+          title: title,
+          month: month + 1,
+          date: date,
+          year: year,
+          timeStart: timeStart,
+          timeEnd: timeEnd,
+          userID: userId
+        };
+  
+        fetch("https://prompt-backend.herokuapp.com/api/appointments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "token": token
+          },
+          body: JSON.stringify(newAppointmentObj)
+        })
+        .then(res => res.json())
+        .then(jsonRes => {
+          setCurrentAppointments([...currentAppointments, jsonRes]);
+        })
+        .catch(err => alert("An error has occured. Please try again later."))
+      };
+    }
   }
 
   const handleDelete = (event) => {
-    event.preventDefault;
+    event.preventDefault();
 
     fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
       method: "DELETE",
@@ -115,34 +136,38 @@ const ConfirmationModal = (props) => {
   }
 
   const handleUpdate = (event) => {
-    event.preventDefault;
+    event.preventDefault();
 
-    const updateAppointmentObj = {
-      title: title,
-      month: month,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
+    if (!errors.titleInputError || !errors.timeInputError) alert("Please fill in the required fields.");
+    else {
+      const updateAppointmentObj = {
+        title: title,
+        month: month,
+        date: date,
+        year: year,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        userID: userId
+      };
 
-    fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(updateAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      let updatedAppts = currentAppointments.map(appt => {
-        if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
-        return appt;
+      fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify(updateAppointmentObj)
       })
-      setCurrentAppointments(updatedAppts);
-    })
+      .then(res => res.json())
+      .then(jsonRes => {
+        let updatedAppts = currentAppointments.map(appt => {
+          if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
+          return appt;
+        })
+        setCurrentAppointments(updatedAppts)
+      })
+      .catch(err => alert("An error has occured. Please try again later."))
+    };
   }
 
   if (!isShowing) return null;
@@ -156,6 +181,7 @@ const ConfirmationModal = (props) => {
 
         <div className="modal-body">
           <input id="appt-title" name="title" type="text" placeholder="Add title" value={title} onChange={handleChange} />
+          {errors.titleInputError ? <span className="modal-error-message">{errors.titleInputError}</span> : <></>}
 
           <div>
             {months[day.month]} {day.date}, {day.year}
@@ -175,6 +201,7 @@ const ConfirmationModal = (props) => {
               ))}
             </select>
           </div>
+          {errors.timeInputError ? <span className="modal-error-message">{errors.timeInputError}</span> : <></>}
         </div>
         
         <div className = "modal-bottom">
