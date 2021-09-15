@@ -111,7 +111,8 @@ const ConfirmationModal = (props) => {
       })
       .then(res => res.json())
       .then(jsonRes => {
-        setCurrentAppointments([...currentAppointments, jsonRes]);
+        if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+        else setCurrentAppointments([...currentAppointments, jsonRes]);
       })
       .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
     };
@@ -129,7 +130,8 @@ const ConfirmationModal = (props) => {
     })
     .then(res => res.json())
     .then(jsonRes => {
-      setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
+      if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+      else setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
     })
     .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
   }
@@ -160,11 +162,14 @@ const ConfirmationModal = (props) => {
       })
       .then(res => res.json())
       .then(jsonRes => {
-        let updatedAppts = currentAppointments.map(appt => {
-          if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
-          return appt;
-        })
-        setCurrentAppointments(updatedAppts)
+        if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+        else {
+          let updatedAppts = currentAppointments.map(appt => {
+            if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
+            return appt;
+          })
+          setCurrentAppointments(updatedAppts)
+        }
       })
       .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
     };
