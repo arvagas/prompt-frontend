@@ -39,20 +39,20 @@ const ConfirmationModal = (props) => {
     } else setUserId(jwt_decode(token).id)
   }, [token]);
 
-  // useEffect(() => {
-  //   if (isShowing) {
-  //     const closeOnEscapeKeyDown = (event) => {
-  //       if (((event.charCode || event.keyCode) === 27)`` || (event.key === "Escape")) {
-  //         console.log("running")
-  //         toggle;
-  //       }
-  //     }
+  useEffect(() => {
+    if (isShowing) {
+      const closeOnEscapeKeyDown = (event) => {
+        if (((event.charCode || event.keyCode) === 27) || (event.key === "Escape")) {
+          console.log("running")
+          toggle;
+        }
+      }
         
-  //     window.addEventListener("keydown", closeOnEscapeKeyDown)
+      window.addEventListener("keydown", closeOnEscapeKeyDown)
       
-  //     return () => document.body.removeEventListener("keydown", closeOnEscapeKeyDown)
-  //   }
-  // }, []);
+      return () => document.body.removeEventListener("keydown", closeOnEscapeKeyDown)
+    }
+  }, []);
 
   const handleChange = (event) => {
     let { name, value } = event.target
@@ -83,11 +83,11 @@ const ConfirmationModal = (props) => {
     };
   };
 
-  const handleSubmit = (event) => {
+  const handleCreate = (event) => {
     // add validation check to see if there are any error messages first
     event.preventDefault();
 
-    if (errors.titleInputError || errors.timeInputError) alert("Please fill in the required fields.");
+    if (errors.titleInputError || errors.timeInputError);
     else {
       // make sure there are truly no errors if clicked submit instantly
       if (!title) setErrors({...errors, titleInputError: "Title is a required field."});
@@ -114,7 +114,7 @@ const ConfirmationModal = (props) => {
         .then(jsonRes => {
           setCurrentAppointments([...currentAppointments, jsonRes]);
         })
-        .catch(err => alert("An error has occured. Please try again later."))
+        .catch(err => alert(`${err.message}`))
       };
     }
   }
@@ -133,12 +133,13 @@ const ConfirmationModal = (props) => {
     .then(jsonRes => {
       setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
     })
+    .catch(err => alert(`${err.message}`))
   }
 
   const handleUpdate = (event) => {
     event.preventDefault();
 
-    if (!errors.titleInputError || !errors.timeInputError) alert("Please fill in the required fields.");
+    if (!errors.titleInputError || !errors.timeInputError);
     else {
       const updateAppointmentObj = {
         title: title,
@@ -166,7 +167,7 @@ const ConfirmationModal = (props) => {
         })
         setCurrentAppointments(updatedAppts)
       })
-      .catch(err => alert("An error has occured. Please try again later."))
+      .catch(err => alert(`${err.message}`))
     };
   }
 
@@ -206,7 +207,7 @@ const ConfirmationModal = (props) => {
         
         <div className = "modal-bottom">
           {!apptCheck ?
-            <button className="modal-create" onClick={handleSubmit}>Create</button> :
+            <button className="modal-create" onClick={handleCreate}>Create</button> :
             <>
               <button className="modal-delete" onClick={handleDelete}>Delete</button>
               <button className="modal-update" onClick={handleUpdate}>Update</button>
