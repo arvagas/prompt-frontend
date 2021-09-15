@@ -30,7 +30,8 @@ const ConfirmationModal = (props) => {
   const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : 0);
   const [ errors, setErrors ] = useState({
     titleInputError: "",
-    timeInputError: ""
+    timeInputError: "",
+    finalCheckError: ""
   });
 
   useEffect(() => {
@@ -57,24 +58,23 @@ const ConfirmationModal = (props) => {
   const handleChange = (event) => {
     let { name, value } = event.target
 
-    // data validation, then update values
     switch (name) {
       case 'title':
         if(!value.length) setErrors({...errors, titleInputError: "Title is a required field."});
-        else setErrors({...errors, titleInputError: ""});
+        else setErrors({...errors, titleInputError: "", finalCheckError: ""});
         setTitle(value);
         break;
       case 'timeStart':
         if (timesArr.indexOf(value) >= timesArr.indexOf(timeEnd)) setErrors({...errors, timeInputError: "Start time can not be greater than end time."});
         else {
-          setErrors({...errors, timeInputError: ""});
-          setTimeEnd(value);
+          setErrors({...errors, timeInputError: "", finalCheckError: ""});
+          setTimeStart(value);
         }
         break;
       case 'timeEnd':
         if (timesArr.indexOf(value) <= timesArr.indexOf(timeStart)) setErrors({...errors, timeInputError: "End time must be greater than start time."});
         else {
-          setErrors({...errors, timeInputError: ""});
+          setErrors({...errors, timeInputError: "", finalCheckError: ""});
           setTimeEnd(value);
         }
         break;
@@ -84,39 +84,35 @@ const ConfirmationModal = (props) => {
   };
 
   const handleCreate = (event) => {
-    // add validation check to see if there are any error messages first
     event.preventDefault();
 
-    if (errors.titleInputError || errors.timeInputError);
-    else {
-      // make sure there are truly no errors if clicked submit instantly
-      if (!title) setErrors({...errors, titleInputError: "Title is a required field."});
-      else {
-        const newAppointmentObj = {
-          title: title,
-          month: month + 1,
-          date: date,
-          year: year,
-          timeStart: timeStart,
-          timeEnd: timeEnd,
-          userID: userId
-        };
-  
-        fetch("https://prompt-backend.herokuapp.com/api/appointments", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "token": token
-          },
-          body: JSON.stringify(newAppointmentObj)
-        })
-        .then(res => res.json())
-        .then(jsonRes => {
-          setCurrentAppointments([...currentAppointments, jsonRes]);
-        })
-        .catch(err => alert(`${err.message}`))
+    if (!title || errors.titleInputError) setErrors({...errors, titleInputError: "Title is a required field.", finalCheckError: "Please fill in the required field(s)."});
+    else if (errors.timeInputError) setErrors({...errors, finalCheckError: "Please fill in the required field(s)."});
+    else if (!errors.timeInputError && !errors.titleInputError) {
+      const newAppointmentObj = {
+        title: title,
+        month: month + 1,
+        date: date,
+        year: year,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        userID: userId
       };
-    }
+
+      fetch("https://prompt-backend.herokuapp.com/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify(newAppointmentObj)
+      })
+      .then(res => res.json())
+      .then(jsonRes => {
+        setCurrentAppointments([...currentAppointments, jsonRes]);
+      })
+      .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
+    };
   }
 
   const handleDelete = (event) => {
@@ -133,14 +129,15 @@ const ConfirmationModal = (props) => {
     .then(jsonRes => {
       setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
     })
-    .catch(err => alert(`${err.message}`))
+    .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
   }
 
   const handleUpdate = (event) => {
     event.preventDefault();
 
-    if (!errors.titleInputError || !errors.timeInputError);
-    else {
+    if (!title || errors.titleInputError) setErrors({...errors, titleInputError: "Title is a required field.", finalCheckError: "Please fill in the required field(s)."});
+    else if (errors.timeInputError) setErrors({...errors, finalCheckError: "Please fill in the required field(s)."});
+    else if (!errors.timeInputError && !errors.titleInputError) {
       const updateAppointmentObj = {
         title: title,
         month: month,
@@ -167,7 +164,7 @@ const ConfirmationModal = (props) => {
         })
         setCurrentAppointments(updatedAppts)
       })
-      .catch(err => alert(`${err.message}`))
+      .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
     };
   }
 
@@ -203,6 +200,7 @@ const ConfirmationModal = (props) => {
             </select>
           </div>
           {errors.timeInputError ? <span className="modal-error-message">{errors.timeInputError}</span> : <></>}
+          {errors.finalCheckError ? <span className="modal-error-message">{errors.finalCheckError}</span> : <></>}
         </div>
         
         <div className = "modal-bottom">
