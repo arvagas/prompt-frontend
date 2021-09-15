@@ -40,20 +40,20 @@ const ConfirmationModal = (props) => {
     } else setUserId(jwt_decode(token).id)
   }, [token]);
 
-  useEffect(() => {
-    if (isShowing) {
-      const closeOnEscapeKeyDown = (event) => {
-        if (((event.charCode || event.keyCode) === 27) || (event.key === "Escape")) {
-          console.log("running")
-          toggle;
-        }
-      }
+  // useEffect(() => {
+  //   if (isShowing) {
+  //     const closeOnEscapeKeyDown = (event) => {
+  //       if (((event.charCode || event.keyCode) === 27) || (event.key === "Escape")) {
+  //         console.log("running")
+  //         toggle;
+  //       }
+  //     }
         
-      window.addEventListener("keydown", closeOnEscapeKeyDown)
+  //     window.addEventListener("keydown", closeOnEscapeKeyDown)
       
-      return () => document.body.removeEventListener("keydown", closeOnEscapeKeyDown)
-    }
-  }, []);
+  //     return () => document.body.removeEventListener("keydown", closeOnEscapeKeyDown)
+  //   }
+  // }, []);
 
   const handleChange = (event) => {
     let { name, value } = event.target
