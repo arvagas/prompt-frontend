@@ -62,21 +62,23 @@ const ConfirmationModal = (props) => {
       case 'title':
         if(!value.length) setErrors({...errors, titleInputError: "Title is a required field."});
         else setErrors({...errors, titleInputError: "", finalCheckError: ""});
+
         setTitle(value);
+
         break;
       case 'timeStart':
         if (timesArr.indexOf(value) >= timesArr.indexOf(timeEnd)) setErrors({...errors, timeInputError: "Start time can not be greater than end time."});
-        else {
-          setErrors({...errors, timeInputError: "", finalCheckError: ""});
-          setTimeStart(value);
-        }
+        else setErrors({...errors, timeInputError: "", finalCheckError: ""});
+
+        setTimeStart(value);
+
         break;
       case 'timeEnd':
         if (timesArr.indexOf(value) <= timesArr.indexOf(timeStart)) setErrors({...errors, timeInputError: "End time must be greater than start time."});
-        else {
-          setErrors({...errors, timeInputError: "", finalCheckError: ""});
-          setTimeEnd(value);
-        }
+        else setErrors({...errors, timeInputError: "", finalCheckError: ""});
+
+        setTimeEnd(value);
+        
         break;
       default:
         break;
