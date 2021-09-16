@@ -1,11 +1,20 @@
 // library imports
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import jwt_decode from 'jwt-decode';
+// component imports
+import AccountLoginModal from "../modals/AccountLoginModal";
 // context imports
 import { UserContext } from '../../contexts/UserContext';
 
 const AccountBar = () => {
   const { token, setToken } = useContext(UserContext);
+  const [ loginClicked, setLoginClicked ] = useState(false);
+  const [ registerClicked, setRegisterClicked ] = useState(false);
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+    setLoginClicked(!loginClicked);
+  }
 
   const handleLogout = (event) => {
     event.preventDefault();
@@ -16,7 +25,8 @@ const AccountBar = () => {
     <div className="top-bar">
       {!token ? (
         <>
-          <button className="modal-login">Login</button>
+          <button className="modal-login" onClick={handleLogin}>Login</button>
+          {loginClicked ? <AccountLoginModal loginClicked={loginClicked} handleLogin={handleLogin} /> : <></>}
           <button className="modal-register">Register</button>
         </>
       ) : (
@@ -26,7 +36,7 @@ const AccountBar = () => {
         </>
       )}
     </div>
-  )
+  );
 }
 
 export default AccountBar;
