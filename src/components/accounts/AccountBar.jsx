@@ -3,6 +3,7 @@ import React, { useState, useContext } from 'react';
 import jwt_decode from 'jwt-decode';
 // component imports
 import AccountLoginModal from "../modals/AccountLoginModal";
+import AccountRegisterModal from "../modals/AccountRegisterModal";
 // context imports
 import { UserContext } from '../../contexts/UserContext';
 
@@ -16,6 +17,11 @@ const AccountBar = () => {
     setLoginClicked(!loginClicked);
   }
 
+  const handleRegister = (event) => {
+    event.preventDefault();
+    setRegisterClicked(!registerClicked);
+  }
+
   const handleLogout = (event) => {
     event.preventDefault();
     setToken("");
@@ -27,7 +33,8 @@ const AccountBar = () => {
         <>
           <button className="modal-login" onClick={handleLogin}>Login</button>
           {loginClicked ? <AccountLoginModal loginClicked={loginClicked} handleLogin={handleLogin} /> : <></>}
-          <button className="modal-register">Register</button>
+          <button className="modal-register" onClick={handleRegister}>Register</button>
+          {registerClicked ? <AccountRegisterModal registerClicked={registerClicked} setRegisterClicked={setRegisterClicked} handleRegister={handleRegister} /> : <></>}
         </>
       ) : (
         <>
