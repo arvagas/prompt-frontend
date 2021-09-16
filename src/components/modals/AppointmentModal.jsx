@@ -27,7 +27,7 @@ const ConfirmationModal = (props) => {
   const [ year, setYear ] = useState(apptForTheDay ? apptForTheDay.year : day.year);
   const [ timeStart, setTimeStart ] = useState(apptForTheDay ? apptForTheDay.timeStart : defaultStartTime);
   const [ timeEnd, setTimeEnd ] = useState(apptForTheDay ? apptForTheDay.timeEnd : defaultEndTime);
-  const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : 0);
+  const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : "");
   const [ errors, setErrors ] = useState({
     titleInputError: "",
     timeInputError: "",
@@ -36,7 +36,7 @@ const ConfirmationModal = (props) => {
 
   useEffect(() => {
     if (!token) {
-      setUserId(0);
+      setUserId("");
     } else setUserId(jwt_decode(token).id)
   }, [token]);
 
@@ -121,6 +121,9 @@ const ConfirmationModal = (props) => {
   const handleDelete = (event) => {
     event.preventDefault();
 
+    // check to see if logged in user is the same creator as appt
+    if (apptForTheDay.userID !== userId) return alert(`You are not authorized to modify the appointment for ${months[day.month]} ${day.date}, ${day.year}.`)
+
     fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
       method: "DELETE",
       headers: {
@@ -138,6 +141,9 @@ const ConfirmationModal = (props) => {
 
   const handleUpdate = (event) => {
     event.preventDefault();
+
+    // check to see if logged in user is the same creator as appt
+    if (apptForTheDay.userID !== userId) return alert(`You are not authorized to modify the appointment for ${months[day.month]} ${day.date}, ${day.year}.`)
 
     if (!title || errors.titleInputError) setErrors({...errors, titleInputError: "Title is a required field.", finalCheckError: "Please fill in the required field(s)."});
     else if (errors.timeInputError) setErrors({...errors, finalCheckError: "Please fill in the required field(s)."});

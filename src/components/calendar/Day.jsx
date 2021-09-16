@@ -41,7 +41,7 @@ const Day = ( props ) => {
     <div
       className={`date ${day.date === currentDate.getDate() ? "today" : ""} ${day.date < currentDate.getDate() ? "past" : ""}`}
       style={ {gridColumn: day.date === 1 ? startingWeekday : ""} }
-      onClick={token ? toggle : () => alert(`You must be logged in to modify appointments for ${months[day.month]} ${day.date}, ${day.year}.`)}
+      onClick={token ? toggle : () => alert(`You are not authorized to modify the appointment for ${months[day.month]} ${day.date}, ${day.year}.`)}
     >
       {day.date}
       {appointmentForTheDay ? (
