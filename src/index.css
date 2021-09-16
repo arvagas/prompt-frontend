@@ -154,3 +154,8 @@ button {
 .modal-bottom button:not(last-child) {
   margin-right: 1rem;
 }
+
+.modal-error-message {
+  color: red;
+  font-size: 0.8rem;
+}

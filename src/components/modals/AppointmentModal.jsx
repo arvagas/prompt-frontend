@@ -27,18 +27,23 @@ const ConfirmationModal = (props) => {
   const [ year, setYear ] = useState(apptForTheDay ? apptForTheDay.year : day.year);
   const [ timeStart, setTimeStart ] = useState(apptForTheDay ? apptForTheDay.timeStart : defaultStartTime);
   const [ timeEnd, setTimeEnd ] = useState(apptForTheDay ? apptForTheDay.timeEnd : defaultEndTime);
-  const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : 0);
+  const [ userId, setUserId ] = useState(apptForTheDay ? apptForTheDay.userID : "");
+  const [ errors, setErrors ] = useState({
+    titleInputError: "",
+    timeInputError: "",
+    finalCheckError: ""
+  });
 
   useEffect(() => {
     if (!token) {
-      setUserId(0);
+      setUserId("");
     } else setUserId(jwt_decode(token).id)
   }, [token]);
 
   // useEffect(() => {
   //   if (isShowing) {
   //     const closeOnEscapeKeyDown = (event) => {
-  //       if (((event.charCode || event.keyCode) === 27)`` || (event.key === "Escape")) {
+  //       if (((event.charCode || event.keyCode) === 27) || (event.key === "Escape")) {
   //         console.log("running")
   //         toggle;
   //       }
@@ -53,53 +58,71 @@ const ConfirmationModal = (props) => {
   const handleChange = (event) => {
     let { name, value } = event.target
 
-    // data validation, then update values
     switch (name) {
       case 'title':
-        // validation to have title > 1
+        if(!value.length) setErrors({...errors, titleInputError: "Title is a required field."});
+        else setErrors({...errors, titleInputError: "", finalCheckError: ""});
+
         setTitle(value);
+
         break;
       case 'timeStart':
+        if (timesArr.indexOf(value) >= timesArr.indexOf(timeEnd)) setErrors({...errors, timeInputError: "Start time can not be greater than end time."});
+        else setErrors({...errors, timeInputError: "", finalCheckError: ""});
+
         setTimeStart(value);
+
         break;
       case 'timeEnd':
+        if (timesArr.indexOf(value) <= timesArr.indexOf(timeStart)) setErrors({...errors, timeInputError: "End time must be greater than start time."});
+        else setErrors({...errors, timeInputError: "", finalCheckError: ""});
+
         setTimeEnd(value);
+        
         break;
       default:
         break;
     };
   };
 
-  const handleSubmit = (event) => {
-    // add validation check to see if there are any error messages first
+  const handleCreate = (event) => {
     event.preventDefault();
 
-    const newAppointmentObj = {
-      title: title,
-      month: month + 1,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
+    if (!title || errors.titleInputError) setErrors({...errors, titleInputError: "Title is a required field.", finalCheckError: "Please fill in the required field(s)."});
+    else if (errors.timeInputError) setErrors({...errors, finalCheckError: "Please fill in the required field(s)."});
+    else if (!errors.timeInputError && !errors.titleInputError) {
+      const newAppointmentObj = {
+        title: title,
+        month: month + 1,
+        date: date,
+        year: year,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        userID: userId
+      };
 
-    fetch("https://prompt-backend.herokuapp.com/api/appointments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(newAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      setCurrentAppointments([...currentAppointments, jsonRes]);
-    })
+      fetch("https://prompt-backend.herokuapp.com/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify(newAppointmentObj)
+      })
+      .then(res => res.json())
+      .then(jsonRes => {
+        if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+        else setCurrentAppointments([...currentAppointments, jsonRes]);
+      })
+      .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
+    };
   }
 
   const handleDelete = (event) => {
-    event.preventDefault;
+    event.preventDefault();
+
+    // check to see if logged in user is the same creator as appt
+    if (apptForTheDay.userID !== userId) return alert(`You are not authorized to modify the appointment for ${months[day.month]} ${day.date}, ${day.year}.`)
 
     fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
       method: "DELETE",
@@ -110,39 +133,52 @@ const ConfirmationModal = (props) => {
     })
     .then(res => res.json())
     .then(jsonRes => {
-      setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
+      if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+      else setCurrentAppointments(currentAppointments.filter(appt => appt.id !== apptForTheDay.id));
     })
+    .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
   }
 
   const handleUpdate = (event) => {
-    event.preventDefault;
+    event.preventDefault();
 
-    const updateAppointmentObj = {
-      title: title,
-      month: month,
-      date: date,
-      year: year,
-      timeStart: timeStart,
-      timeEnd: timeEnd,
-      userID: userId
-    };
+    // check to see if logged in user is the same creator as appt
+    if (apptForTheDay.userID !== userId) return alert(`You are not authorized to modify the appointment for ${months[day.month]} ${day.date}, ${day.year}.`)
 
-    fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify(updateAppointmentObj)
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      let updatedAppts = currentAppointments.map(appt => {
-        if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
-        return appt;
+    if (!title || errors.titleInputError) setErrors({...errors, titleInputError: "Title is a required field.", finalCheckError: "Please fill in the required field(s)."});
+    else if (errors.timeInputError) setErrors({...errors, finalCheckError: "Please fill in the required field(s)."});
+    else if (!errors.timeInputError && !errors.titleInputError) {
+      const updateAppointmentObj = {
+        title: title,
+        month: month,
+        date: date,
+        year: year,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        userID: userId
+      };
+
+      fetch("https://prompt-backend.herokuapp.com/api/appointments/" + apptForTheDay.id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify(updateAppointmentObj)
       })
-      setCurrentAppointments(updatedAppts);
-    })
+      .then(res => res.json())
+      .then(jsonRes => {
+        if (jsonRes.err) setErrors({...errors, finalCheckError: `${jsonRes.err}`});
+        else {
+          let updatedAppts = currentAppointments.map(appt => {
+            if (appt.id === jsonRes.id) return {...jsonRes, title: title, timeStart: timeStart, timeEnd: timeEnd};
+            return appt;
+          })
+          setCurrentAppointments(updatedAppts)
+        }
+      })
+      .catch(err => setErrors({...errors, finalCheckError: `${err.message}`}))
+    };
   }
 
   if (!isShowing) return null;
@@ -156,6 +192,7 @@ const ConfirmationModal = (props) => {
 
         <div className="modal-body">
           <input id="appt-title" name="title" type="text" placeholder="Add title" value={title} onChange={handleChange} />
+          {errors.titleInputError ? <span className="modal-error-message">{errors.titleInputError}</span> : <></>}
 
           <div>
             {months[day.month]} {day.date}, {day.year}
@@ -175,11 +212,13 @@ const ConfirmationModal = (props) => {
               ))}
             </select>
           </div>
+          {errors.timeInputError ? <span className="modal-error-message">{errors.timeInputError}</span> : <></>}
+          {errors.finalCheckError ? <span className="modal-error-message">{errors.finalCheckError}</span> : <></>}
         </div>
         
         <div className = "modal-bottom">
           {!apptCheck ?
-            <button className="modal-create" onClick={handleSubmit}>Create</button> :
+            <button className="modal-create" onClick={handleCreate}>Create</button> :
             <>
               <button className="modal-delete" onClick={handleDelete}>Delete</button>
               <button className="modal-update" onClick={handleUpdate}>Update</button>

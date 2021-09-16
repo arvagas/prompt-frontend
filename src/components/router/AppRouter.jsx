@@ -40,21 +40,6 @@ const AppRouter = () => {
       })
   }, [])
 
-  // this is temporary
-  useEffect(() => {
-    fetch("https://prompt-backend.herokuapp.com/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({username: "admin", password: "password1234"})
-    })
-    .then(res => res.json())
-    .then(jsonRes => {
-      setToken(jsonRes.token)
-    })
-  }, [])
-
   let userValues = { token, setToken };
   let dateTimeValues = {
     defaultStartTime, defaultEndTime,
